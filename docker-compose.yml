@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: node:20
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_NAME=temporal-evolution
+      - PORT=3000
+      - NODE_ENV=development
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm start
+
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=temporal-evolution
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
