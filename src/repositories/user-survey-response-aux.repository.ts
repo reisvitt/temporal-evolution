@@ -7,12 +7,12 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
   constructor(private prisma: PrismaClient){}
 
   async findAll(): Promise<UserSurveyResponseAux[]> {
-    const data = await this.prisma.user.findMany();
-    return data.map((u: any) => new UserSurveyResponseAux(u.id, u.name, u.email));
+    const data = await this.prisma.usersSurveysResponsesAux.findMany();
+    return data.map((u: any) => new UserSurveyResponseAux(u.id, u.origin, u.responseStatusId));
   }
 
   async findById(id: number): Promise<UserSurveyResponseAux | null> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
-    return user ? new UserSurveyResponseAux(user.id, user.name, user.email) : null;
+    const user = await this.prisma.usersSurveysResponsesAux.findUnique({ where: { id } });
+    return user ? new UserSurveyResponseAux(user.id, user.origin, user.responseStatusId) : null;
   }
 }

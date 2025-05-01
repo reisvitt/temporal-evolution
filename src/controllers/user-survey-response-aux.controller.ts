@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UserSurveyResponseAuxService } from '../services/user-survey-response-aux.service';
 
-export class UserSurveyResponseAux {
+export class UserSurveyResponseAuxController {
   constructor(private userService: UserSurveyResponseAuxService) {}
 
   async getAllUsers(req: Request, res: Response) {
