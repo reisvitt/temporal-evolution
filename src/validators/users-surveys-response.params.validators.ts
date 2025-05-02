@@ -9,7 +9,8 @@ export const usersSurveysResponseParamsSchema = z.object({
   }),
   to: z.string().optional().refine(validateDateFormat, {
     message: "Data precista ter o formato DD/MM/YYYY"
-  })
+  }),
+  status: z.number().optional()
 })
 
 export type TUsersSurveysResponseParams = z.infer<typeof usersSurveysResponseParamsSchema>

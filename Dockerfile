@@ -16,15 +16,11 @@ WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/package*.json ./
 COPY --from=builder /usr/src/app/dist ./dist
-COPY ./prisma ./prisma
 
-COPY scripts/seed.sql /usr/src/app/scripts/seed.sql
-COPY scripts/entrypoint.sh /usr/src/app/scripts/entrypoint.sh
+COPY scripts/* /usr/src/app/scripts/
 
 RUN chmod +x /usr/src/app/scripts/entrypoint.sh
 RUN npm install --omit=dev
-
-RUN npx prisma generate
 
 RUN apt-get update && apt-get install -y postgresql-client
 

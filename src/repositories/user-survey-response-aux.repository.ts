@@ -1,43 +1,36 @@
-import { PrismaClient } from "@prisma/client";
+import { Pool } from "pg";
 import { UserSurveyResponseRepository } from "../interfaces/user-survey-response-aux-repository.interface";
 import { UserSurveyResponseAux } from "../models/user-survey-response-aux.model";
 import { TUsersSurveysResponseParams } from "../validators/users-surveys-response.params.validators";
-import { formatDateToISO } from "../utils/date.utils";
 import { INTERVAL_ENUM } from "../enums/interval.enum";
 import { UserSurveyResponsePeriod } from "../models/user-survey-response-period.model";
 
 export class UserSurveyResponseAuxRepository implements UserSurveyResponseRepository {
 
-  constructor(private prisma: PrismaClient){}
+  constructor(private database: Pool){}
 
   async findAll(): Promise<UserSurveyResponseAux[]> {
-    const data = await this.prisma.usersSurveysResponsesAux.findMany();
-    return data.map((u: any) => new UserSurveyResponseAux(u.id, u.origin, u.responseStatusId, new Date(u.createdAt)));
+    const data = await this.database.query("SELECT * FROM inside.users_surveys_responses_aux")
+    return data.rows.map((u: any) => new UserSurveyResponseAux(u.id, u.origin, u.responseStatusId, new Date(u.createdAt)));
   }
 
   async findById(id: number): Promise<UserSurveyResponseAux | null> {
-    const user = await this.prisma.usersSurveysResponsesAux.findUnique({ where: { id } });
-    return user ? new UserSurveyResponseAux(user.id, user.origin, user.responseStatusId, user.createdAt) : null;
+    const result = await this.database.query("SELECT * FROM inside.users_surveys_responses_aux WHERE id = $1", [id])
+
+    if(!result) {
+      throw new Error("Erro na busca")
+    }
+
+    if(result.rows.length === 0){
+      throw new Error("Not found")
+    }
+
+    const userR = result.rows[0]
+    
+    return userR ? new UserSurveyResponseAux(userR.id, userR.origin, userR.responseStatusId, userR.createdAt) : null;
   }
 
   async withParams(params: TUsersSurveysResponseParams): Promise<UserSurveyResponsePeriod[]> {
-    const values: (string | number)[] = [];
-    const conditions: string[] = [];
-
-    if (params.from) {
-      conditions.push(`created_at >= to_timestamp($${conditions.length + 1}, \'YYYY-MM-DD\')`);
-      values.push(formatDateToISO(params.from));
-    }
-    if (params.to) {
-      conditions.push(`created_at <= to_timestamp($${conditions.length + 1}, \'YYYY-MM-DD\')`);
-      values.push(formatDateToISO(params.to));
-    }
-    
-    let where = ''
-    if (conditions.length > 0) {
-      where += ' WHERE ' + conditions.join(' AND ');
-    }
-    
     const groupByClause = this.getGroupByClause(params.interval);
     
     let query = `
@@ -45,14 +38,29 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
         ${groupByClause},
         COUNT(*) AS count
       FROM inside.users_surveys_responses_aux
-      ${where}
-      GROUP BY period
-      ORDER BY period
+      WHERE
+        ($1::TIMESTAMP IS NULL OR created_at >= $1) AND
+        ($2::TIMESTAMP IS NULL OR created_at <= $2) AND
+        ($3::VARCHAR IS NULL OR origin = $3) AND
+        ($4::INTEGER IS NULL OR status_id = $4)
+      GROUP BY
+          ${groupByClause},
+          origin,
+          status_id
+      ORDER BY period, origin, status_id
     `;
 
-    console.log("query", query)
+    const values = [
+      params.from || null,
+      params.to || null,
+      origin || null,
+      params.status || null,
+    ]
 
-    const rows = await this.prisma.$queryRawUnsafe(query, ...values);
+    console.log("query", query)
+    console.log("values", values)
+
+    const { rows } = await this.database.query(query, values);
     return (rows as any[]).map((row) => ({
       period: row.period,
       count: parseInt(row.count),

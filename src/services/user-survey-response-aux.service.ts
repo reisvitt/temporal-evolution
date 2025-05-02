@@ -14,11 +14,6 @@ export class UserSurveyResponseAuxService {
     return this.userRepository.withParams(params)
   }
 
-  async getUsersSurveysResponsesBySemester(params: TUsersSurveysResponseParams): Promise<UserSurveyResponseAux[]> {
-  
-    return this.userRepository.findAll();
-  }
-
   async getUserSurveyResponseById(id: number): Promise<UserSurveyResponseAux | null> {
     return this.userRepository.findById(id);
   }
