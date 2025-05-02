@@ -21,29 +21,36 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
   }
 
   async withParams(params: TUsersSurveysResponseParams): Promise<UserSurveyResponsePeriod[]> {
-    const where: any = {};
+    const values: (string | number)[] = [];
+    const conditions: string[] = [];
+
     if (params.from) {
-      where.createdAt = { gte: new Date(formatDateToISO(params.from)) };
+      conditions.push(`created_at >= to_timestamp($${conditions.length + 1}, \'YYYY-MM-DD\')`);
+      values.push(formatDateToISO(params.from));
     }
     if (params.to) {
-      where.createdAt = where.createdAt || {};
-      where.createdAt.lte = new Date(formatDateToISO(params.to));
+      conditions.push(`created_at <= to_timestamp($${conditions.length + 1}, \'YYYY-MM-DD\')`);
+      values.push(formatDateToISO(params.to));
     }
-
+    
+    let where = ''
+    if (conditions.length > 0) {
+      where += ' WHERE ' + conditions.join(' AND ');
+    }
+    
     const groupByClause = this.getGroupByClause(params.interval);
-    const query = `
+    
+    let query = `
       SELECT 
         ${groupByClause},
         COUNT(*) AS count
       FROM inside.users_surveys_responses_aux
-      ${where.createdAt ? 'WHERE "created_at" >= to_timestamp($1, \'YYYY-MM-DD\') AND "created_at" <= to_timestamp($2, \'YYYY-MM-DD\')' : ''}
+      ${where}
       GROUP BY period
       ORDER BY period
     `;
 
-    const values = where.createdAt
-      ? [formatDateToISO(params.from!), formatDateToISO(params.to!)]
-      : [];
+    console.log("query", query)
 
     const rows = await this.prisma.$queryRawUnsafe(query, ...values);
     return (rows as any[]).map((row) => ({
@@ -57,22 +64,22 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
     switch (interval) {
       case INTERVAL_ENUM.WEEK:
         return `
-          CONCAT(EXTRACT(YEAR FROM "created_at"), '-W', 
+          CONCAT(EXTRACT(YEAR FROM "created_at"), '-SEMANA-', 
             LPAD(EXTRACT(WEEK FROM "created_at")::TEXT, 2, '0')) AS period
           `;
       case INTERVAL_ENUM.MONTH:
         return `
-          CONCAT(EXTRACT(YEAR FROM "created_at"), '-', 
+          CONCAT(EXTRACT(YEAR FROM "created_at"), '-MES-', 
             LPAD(EXTRACT(MONTH FROM "created_at")::TEXT, 2, '0')) AS period
           `;
       case INTERVAL_ENUM.QUARTER:
         return `
-          CONCAT(EXTRACT(YEAR FROM "created_at"), '-Q', 
+          CONCAT(EXTRACT(YEAR FROM "created_at"), '-TRIMESTRE-', 
             EXTRACT(QUARTER FROM "created_at")) AS period
           `;
       case INTERVAL_ENUM.SEMESTER:
         return `
-          CONCAT(EXTRACT(YEAR FROM "created_at"), '-', 
+          CONCAT(EXTRACT(YEAR FROM "created_at"), '-SEMESTRE-', 
             CASE WHEN EXTRACT(MONTH FROM "created_at") <= 6 THEN 'S1' ELSE 'S2' END) AS period
           `;
       case INTERVAL_ENUM.YEAR:
