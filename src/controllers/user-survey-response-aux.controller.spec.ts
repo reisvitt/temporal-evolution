@@ -3,6 +3,7 @@ import { UserSurveyResponseAuxService } from "../services/user-survey-response-a
 import { usersSurveysResponsesAuxMock } from "../testing/user-survey-response-aux/users-surveys-responses-aux.mock";
 import { UserSurveyResponseAuxController } from "./user-survey-response-aux.controller"
 import { userSurveyResponseAuxMock } from "../testing/user-survey-response-aux/user-survey-response-aux.mock";
+import { userSurveyResponsePeriodMock } from "../testing/user-survey-response-aux/dashboard-response.mock";
 
 jest.mock('../services/user-survey-response-aux.service');
 
@@ -31,6 +32,7 @@ describe('UserSurveyResponseAuxController', () => {
       }
       return Promise.resolve(null);
     })
+    mockService.getUsersSurveysResponsesFilters.mockResolvedValue(userSurveyResponsePeriodMock)
   })
 
   afterEach(() => {
@@ -80,6 +82,28 @@ describe('UserSurveyResponseAuxController', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockService.getUserSurveyResponseById).not.toHaveBeenCalled()
+    });
+  });
+
+  describe('getUsersSurveyResponsesPeriod', () => {
+    it('should return dashboard data', async () => {
+      mockRequest.query = {}
+      await controller.getUsersSurveyResponsesPeriod(mockRequest as Request, mockResponse as Response)
+
+      expect(mockService.getUsersSurveysResponsesFilters).toHaveBeenCalled()
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(userSurveyResponsePeriodMock);
+    });
+
+    it('should return validation error', async () => {
+      mockRequest.query = {
+        from: 'WRONG_DATE_FORMAT',
+      }
+      await controller.getUsersSurveyResponsesPeriod(mockRequest as Request, mockResponse as Response)
+
+      expect(mockService.getUsersSurveysResponsesFilters).not.toHaveBeenCalled()
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalled()
     });
   });
 })

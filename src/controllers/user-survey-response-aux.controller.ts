@@ -13,7 +13,7 @@ export class UserSurveyResponseAuxController {
   async getUsersSurveyResponsesPeriod(req: Request, res: Response) {
     const parsed = usersSurveysResponseParamsSchema.safeParse(req.query)
 
-    if(parsed.error){
+    if(!parsed?.success){
       res.status(400).json({
         message: parsed.error.errors.map(error => error.message).join("; "),
       })
@@ -21,7 +21,7 @@ export class UserSurveyResponseAuxController {
     }
 
     const users = await this.userService.getUsersSurveysResponsesFilters(parsed.data);
-    res.json(users);
+    res.status(200).json(users);
   }
 
   async getUserSurveyResponseById(req: Request, res: Response) {
@@ -35,7 +35,7 @@ export class UserSurveyResponseAuxController {
       res.status(404).json({ message: 'User not found' });
       return
     } 
-    
+
     res.status(200).json(user);
   }
 }
