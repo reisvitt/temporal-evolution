@@ -8,7 +8,11 @@ psql $DATABASE_URL -f /usr/src/app/scripts/create_temp_table.sql
 psql $DATABASE_URL -f /usr/src/app/scripts/create_partitions.sql
 psql $DATABASE_URL -f /usr/src/app/scripts/create_partitions_indexes.sql
 
-curl -o seed.sql $SEED_URL
+echo "Realizando download Seed.sql da URL=SEED_URL$"
+curl -o /usr/src/app/scripts/seed.sql $SEED_URL
+echo "Download realizado com sucesso!"
+
+ls -a /usr/src/app/scripts/
 
 # Verifica se a tabela temporária está vazia
 COUNT_TEMP_TABLE=$(psql $DATABASE_URL -t -c "SELECT COUNT(*) FROM $TEMP_TABLE_NAME;")
