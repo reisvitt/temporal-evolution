@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 
 import {
   Card,
@@ -16,10 +16,10 @@ import {
 } from "@/components/ui/chart"
 import { Loading } from "../ui/loading"
 
-type TBarChartComponent = {
+type TLineChartComponent = {
   title?: string
   xAxisKey: string
-  barKey: string
+  lineKey: string
   config: ChartConfig,
   data: any[]
   formatterTooltip: (value: any, name: string, item: any) => string
@@ -27,16 +27,16 @@ type TBarChartComponent = {
   className?: string,
 }
 
-export const BarChartComponent = ({
+export const LineChartComponent = ({
   title,
   xAxisKey,
-  barKey,
+  lineKey,
   config,
   data,
   formatterTooltip,
   loading,
   className,
-}: TBarChartComponent) => {
+}: TLineChartComponent) => {
   return (
     <Card className={className}>
       <CardHeader >
@@ -52,25 +52,41 @@ export const BarChartComponent = ({
 
         {data && data.length > 0 && (
           <ChartContainer config={config}>
-            <BarChart accessibilityLayer data={data}>
+            <LineChart
+              accessibilityLayer
+              data={data}
+              margin={{
+                top: 20,
+                left: 12,
+                right: 12,
+              }}
+            >
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey={xAxisKey}
                 tickLine={false}
-                tickMargin={10}
                 axisLine={false}
+                tickMargin={8}
               />
               <ChartTooltip
                 cursor={false}
-                content={<ChartTooltipContent hideLabel />}
+                content={<ChartTooltipContent indicator="line" />}
                 formatter={formatterTooltip}
               />
-              <Bar
-                dataKey={barKey}
-                fill="var(--color-primary)"
-                radius={8}
-              />
-            </BarChart>
+              <Line
+                dataKey={lineKey}
+                type="natural"
+                stroke="var(--color-primary)"
+                strokeWidth={2}
+                dot={{
+                  fill: "var(--color-primary)",
+                }}
+                activeDot={{
+                  r: 6,
+                }}
+              >
+              </Line>
+            </LineChart>
           </ChartContainer>
         )}
       </CardContent>

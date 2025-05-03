@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { Cell, Pie, PieChart } from "recharts"
 
 import {
   Card,
@@ -16,27 +16,25 @@ import {
 } from "@/components/ui/chart"
 import { Loading } from "../ui/loading"
 
-type TBarChartComponent = {
+type TPieChartComponent = {
   title?: string
-  xAxisKey: string
-  barKey: string
+  dataKey: string
+  nameKey: string
   config: ChartConfig,
   data: any[]
-  formatterTooltip: (value: any, name: string, item: any) => string
   loading?: boolean
   className?: string,
 }
 
-export const BarChartComponent = ({
+export const PieChartComponent = ({
   title,
-  xAxisKey,
-  barKey,
+  dataKey,
+  nameKey,
   config,
   data,
-  formatterTooltip,
   loading,
   className,
-}: TBarChartComponent) => {
+}: TPieChartComponent) => {
   return (
     <Card className={className}>
       <CardHeader >
@@ -52,25 +50,14 @@ export const BarChartComponent = ({
 
         {data && data.length > 0 && (
           <ChartContainer config={config}>
-            <BarChart accessibilityLayer data={data}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey={xAxisKey}
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-                formatter={formatterTooltip}
-              />
-              <Bar
-                dataKey={barKey}
-                fill="var(--color-primary)"
-                radius={8}
-              />
-            </BarChart>
+            <PieChart>
+              <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
+              <Pie data={data} dataKey={dataKey} label nameKey={nameKey}>
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={config[entry[nameKey]]?.color || '#ccc'} />
+                ))}
+              </Pie>
+            </PieChart>
           </ChartContainer>
         )}
       </CardContent>

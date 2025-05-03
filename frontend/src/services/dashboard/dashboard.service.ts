@@ -1,6 +1,7 @@
 import { Axios } from "axios";
 import { Period } from "../../models/period.model";
-import { TuserResponseSchema } from "../../validators/period.validators";
+import { Origin } from "@/models/origin.model";
+import { TuserResponseOriginSchema, TuserResponseSchema } from "../../validators/period.validators";
 import { api } from "../api";
 
 export class DashboardService {
@@ -10,7 +11,13 @@ export class DashboardService {
   }
 
   async getPeriod(params?: TuserResponseSchema): Promise<Period[]>{
-    const result = await this.api.get<Period[]>("/dashboard/users-surveys-responses", { params })
+    const result = await this.api.get<Period[]>("/dashboard/users-surveys-responses/period", { params })
+
+    return result.data
+  }
+
+  async getOrigin(params?: TuserResponseOriginSchema): Promise<Origin[]>{
+    const result = await this.api.get<Origin[]>("/dashboard/users-surveys-responses/origin", { params })
 
     return result.data
   }

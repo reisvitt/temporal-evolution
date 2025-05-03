@@ -19,14 +19,14 @@ export const InputDate = ({ value, onChange, className, ...props }: TInputDate) 
         <Button
           className={cn(
             "w-full border bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
-            !props.selected && "text-muted-foreground",
+            !props.selected && "text-gray-900 text-xs",
             className,
           )}
         >
           {value ? (
-            format(value, "PPP")
+            format(value, 'dd/MM/yyyy')
           ) : (
-            <span>Selecione a data</span>
+            <>Selecione a data</>
           )}
           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
         </Button>

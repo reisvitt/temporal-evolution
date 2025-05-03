@@ -3,24 +3,41 @@ import { useEffect, useState } from "react";
 import { Period } from "../../models/period.model";
 import { DashboardService } from "../../services/dashboard/dashboard.service";
 import { TuserResponseSchema } from "@/validators/period.validators";
+import { Origin } from "@/models/origin.model";
 
 export const useHomeModel = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
+  const [origins, setOrigins] = useState<Origin[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const onLoad = async (values?: TuserResponseSchema): Promise<void> => {
     setLoading(true);
-    try {
-      const service = new DashboardService();
-      const response: Period[] = await service.getPeriod(values)
+    
+    const service = new DashboardService();
 
-      setPeriods(response);
-    } catch (error) {
-      toast.error( (error as Error).message ||
-      "Falha ao carregar periodos. Tente novamente mais tarde.",)
-    } finally {
-      setLoading(false);
-    }
+    const allRequests = []
+
+    allRequests.push(service.getPeriod(values))
+    allRequests.push(service.getOrigin(values))
+
+    const result = await Promise.allSettled(allRequests)
+
+    result.forEach((request, index) => {
+      if(request.status === 'rejected'){
+        toast.error("Falha ao carregar dados. Tente novamente mais tarde.")
+        return;
+      }
+
+      switch(index){
+        case 0: 
+          setPeriods(request.value as Period[])
+          break;
+        case 1: 
+          setOrigins(request.value as Origin[])
+          break;
+      }
+    })
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -29,6 +46,7 @@ export const useHomeModel = () => {
 
   return {
     periods,
+    origins,
     loading,
     reload: onLoad
   };

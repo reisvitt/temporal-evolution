@@ -78,7 +78,8 @@ interface MultiSelectProps
    * Callback function triggered when the selected values change.
    * Receives an array of the new selected values.
    */
-  onValueChange: (value: string[]) => void;
+  onValueChange?: (value?: string) => void;
+  onValuesChange?: (value: string[]) => void;
 
   /** The default selected values when the component mounts. */
   defaultValue?: string[];
@@ -125,6 +126,8 @@ interface MultiSelectProps
    * Optional, can be used to add custom styles.
    */
   isMulti?: boolean;
+
+  value?: any | any[];
 }
 
 const SelectComponent = React.forwardRef<
@@ -135,6 +138,7 @@ const SelectComponent = React.forwardRef<
     {
       options,
       onValueChange,
+      onValuesChange,
       variant,
       defaultValue = [],
       placeholder = "Selecione",
@@ -143,12 +147,11 @@ const SelectComponent = React.forwardRef<
       modalPopover = false,
       asChild = false,
       className,
+      value,
       ...props
     },
     ref
   ) => {
-    const [selectedValues, setSelectedValues] =
-      React.useState<string[]>(defaultValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
 
@@ -158,24 +161,26 @@ const SelectComponent = React.forwardRef<
       if (event.key === "Enter") {
         setIsPopoverOpen(true);
       } else if (event.key === "Backspace" && !event.currentTarget.value) {
-        const newSelectedValues = [...selectedValues];
-        newSelectedValues.pop();
-        setSelectedValues(newSelectedValues);
-        onValueChange(newSelectedValues);
+        const isSelected = !!value
+        if (isSelected && onValueChange) {
+          onValueChange(undefined);
+        }
       }
     };
 
     const toggleOption = (option: string) => {
-      const isSelected = selectedValues.includes(option)
+      const isSelected = option === value
       handleTogglePopover()
       if (isSelected) {
-        setSelectedValues([])
+        if (onValueChange) {
+          onValueChange(undefined)
+        }
         return
       }
 
-      setSelectedValues([option]);
-      onValueChange([option]);
-
+      if (onValueChange) {
+        onValueChange(option);
+      }
     };
 
     const handleTogglePopover = () => {
@@ -204,11 +209,11 @@ const SelectComponent = React.forwardRef<
               className
             )}
           >
-            {selectedValues.length > 0 ? (
+            {value ? (
               <div className="flex justify-between items-center w-full">
                 <div className="flex flex-wrap items-center">
                   <Badge
-                    key={selectedValues[0]}
+                    key={value}
                     className={cn(
                       isAnimating ? "animate-bounce" : "",
                       selectVariants({ variant }),
@@ -216,7 +221,7 @@ const SelectComponent = React.forwardRef<
                     )}
                     style={{ animationDuration: `${animation}s` }}
                   >
-                    {getOption(selectedValues[0])?.label}
+                    {getOption(value)?.label}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
@@ -247,7 +252,7 @@ const SelectComponent = React.forwardRef<
               <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
               <CommandGroup>
                 {options.map((option: any) => {
-                  const isSelected = selectedValues.includes(option.value);
+                  const isSelected = value === option.value;
                   return (
                     <CommandItem
                       key={option.value}
@@ -271,7 +276,7 @@ const SelectComponent = React.forwardRef<
             </CommandList>
           </Command>
         </PopoverContent>
-        {animation > 0 && selectedValues.length > 0 && (
+        {animation > 0 && value && (
           <WandSparkles
             className={cn(
               "cursor-pointer my-2 text-foreground bg-background w-3 h-3",
@@ -293,6 +298,7 @@ const MultiSelectComponent = React.forwardRef<
     {
       options,
       onValueChange,
+      onValuesChange,
       variant,
       defaultValue = [],
       placeholder = "Selecione",
@@ -301,12 +307,11 @@ const MultiSelectComponent = React.forwardRef<
       modalPopover = false,
       asChild = false,
       className,
+      value,
       ...props
     },
     ref
   ) => {
-    const [selectedValues, setSelectedValues] =
-      React.useState<string[]>(defaultValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
 
@@ -316,24 +321,27 @@ const MultiSelectComponent = React.forwardRef<
       if (event.key === "Enter") {
         setIsPopoverOpen(true);
       } else if (event.key === "Backspace" && !event.currentTarget.value) {
-        const newSelectedValues = [...selectedValues];
+        const newSelectedValues = [...value];
         newSelectedValues.pop();
-        setSelectedValues(newSelectedValues);
-        onValueChange(newSelectedValues);
+        if (onValuesChange) {
+          onValuesChange(newSelectedValues);
+        }
       }
     };
 
     const toggleOption = (option: string) => {
-      const newSelectedValues = selectedValues.includes(option)
-        ? selectedValues.filter((value) => value !== option)
-        : [...selectedValues, option];
-      setSelectedValues(newSelectedValues);
-      onValueChange(newSelectedValues);
+      const newSelectedValues = value.includes(option)
+        ? value.filter((val: any) => val !== option)
+        : [...value, option];
+      if (onValuesChange) {
+        onValuesChange(newSelectedValues);
+      }
     };
 
     const handleClear = () => {
-      setSelectedValues([]);
-      onValueChange([]);
+      if (onValuesChange) {
+        onValuesChange([]);
+      }
     };
 
     const handleTogglePopover = () => {
@@ -341,18 +349,20 @@ const MultiSelectComponent = React.forwardRef<
     };
 
     const clearExtraOptions = () => {
-      const newSelectedValues = selectedValues.slice(0, maxCount);
-      setSelectedValues(newSelectedValues);
-      onValueChange(newSelectedValues);
+      const newSelectedValues = value.slice(0, maxCount);
+      if (onValuesChange) {
+        onValuesChange(newSelectedValues);
+      }
     };
 
     const toggleAll = () => {
-      if (selectedValues.length === options.length) {
+      if (value.length === options.length) {
         handleClear();
       } else {
         const allValues = options.map((option: any) => option.value);
-        setSelectedValues(allValues);
-        onValueChange(allValues);
+        if (onValuesChange) {
+          onValuesChange(allValues);
+        }
       }
     };
 
@@ -372,15 +382,15 @@ const MultiSelectComponent = React.forwardRef<
               className
             )}
           >
-            {selectedValues.length > 0 ? (
+            {value.length > 0 ? (
               <div className="flex justify-between items-center w-full">
                 <div className="flex flex-wrap items-center">
-                  {selectedValues.slice(0, maxCount).map((value) => {
-                    const option = options.find((o: any) => o.value === value);
+                  {value.slice(0, maxCount).map((val: any) => {
+                    const option = options.find((o: any) => o.value === val);
                     const IconComponent = option?.icon;
                     return (
                       <Badge
-                        key={value}
+                        key={val}
                         className={cn(
                           isAnimating ? "animate-bounce" : "",
                           selectVariants({ variant })
@@ -395,13 +405,13 @@ const MultiSelectComponent = React.forwardRef<
                           className="ml-2 h-4 w-4 cursor-pointer"
                           onClick={(event) => {
                             event.stopPropagation();
-                            toggleOption(value);
+                            toggleOption(val);
                           }}
                         />
                       </Badge>
                     );
                   })}
-                  {selectedValues.length > maxCount && (
+                  {value.length > maxCount && (
                     <Badge
                       className={cn(
                         "bg-transparent text-foreground border-foreground/1 hover:bg-transparent",
@@ -410,7 +420,7 @@ const MultiSelectComponent = React.forwardRef<
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
-                      {`+ ${selectedValues.length - maxCount} more`}
+                      {`+ ${value.length - maxCount} mais`}
                       <XCircle
                         className="ml-2 h-4 w-4 cursor-pointer"
                         onClick={(event) => {
@@ -467,19 +477,19 @@ const MultiSelectComponent = React.forwardRef<
                   <div
                     className={cn(
                       "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                      selectedValues.length === options.length
+                      value.length === options.length
                         ? "bg-primary text-primary-foreground"
                         : "opacity-50 [&_svg]:invisible"
                     )}
                   >
-                    <CheckIcon color={selectedValues.length === options.length ? "white" : undefined} className="h-4 w-4" />
+                    <CheckIcon color={value.length === options.length ? "white" : undefined} className="h-4 w-4" />
                   </div>
                   {props.isMulti && (
                     <span>(Selecionar todos)</span>
                   )}
                 </CommandItem>
                 {options.map((option: any) => {
-                  const isSelected = selectedValues.includes(option.value);
+                  const isSelected = value.includes(option.value);
                   return (
                     <CommandItem
                       key={option.value}
@@ -507,7 +517,7 @@ const MultiSelectComponent = React.forwardRef<
               <CommandSeparator />
               <CommandGroup>
                 <div className="flex items-center justify-between">
-                  {selectedValues.length > 0 && (
+                  {value.length > 0 && (
                     <>
                       <CommandItem
                         onSelect={handleClear}
@@ -532,7 +542,7 @@ const MultiSelectComponent = React.forwardRef<
             </CommandList>
           </Command>
         </PopoverContent>
-        {animation > 0 && selectedValues.length > 0 && (
+        {animation > 0 && value.length > 0 && (
           <WandSparkles
             className={cn(
               "cursor-pointer my-2 text-foreground bg-background w-3 h-3",
