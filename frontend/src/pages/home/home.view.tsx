@@ -8,32 +8,34 @@ import { ORIGIN_ENUM, originEnumLabels } from "@/enums/origin.enum";
 import { RadialChartComponent } from "@/components/radial-chart";
 
 export function HomeView({ loading, periods, origins, onSubmit, }: HomeViewProps) {
+
+
   return (
     <div className="page home-page px-4 lg:px-0">
 
       <h1 className="my-10 text-center font-bold text-2xl text-gray-700">Evolução Temporal</h1>
 
-      <HomeFiltersComponent onSubmit={onSubmit} loading={loading} />
+      <HomeFiltersComponent
+        onSubmit={onSubmit}
+        loading={loading}
+      />
 
-      <section className="flex flex-wrap justify-between mt-12 gap-6">
+      <section className="flex flex-wrap justify-between mt-12 mb-12 gap-4 xl:gap-6">
         {origins.map(origin => (
           <RadialChartComponent
-            dataKey="count"
-            radialKey="origin"
             config={{
               origin: {
                 label: "Origem",
                 color: `var(--color-${origin.origin})`,
               },
             }}
-            data={[{
-              count: origin.count,
-              origin: originEnumLabels[origin.origin as ORIGIN_ENUM],
-              color: `var(--color-${origin.origin})`,
-            }]}
-            title={`Quantidade ${originEnumLabels[origin.origin as ORIGIN_ENUM]}`}
+            value={origin.count}
+            color={`var(--color-primary)`}
+            total={origin.total || 1}
+            label={originEnumLabels[origin.origin as ORIGIN_ENUM]}
+            title={`Quantidade - ${originEnumLabels[origin.origin as ORIGIN_ENUM]}`}
             loading={loading}
-            className={`data-[length='1']:w-[49%] data-[length='3']:w-[32%]`}
+            className={`w-full md:data-[length='1']:w-[49%] md:data-[length='3']:w-[32%]`}
             data-length={origins.length}
           />
         ))}
@@ -52,7 +54,7 @@ export function HomeView({ loading, periods, origins, onSubmit, }: HomeViewProps
             return `Periodo: ${item.payload['period']} - Total: ${item.payload['count']}`
           }}
           loading={loading}
-          className="w-[49%]"
+          className="w-full md:w-[49%]"
         />
         <LineChartComponent
           xAxisKey="period"
@@ -69,7 +71,7 @@ export function HomeView({ loading, periods, origins, onSubmit, }: HomeViewProps
             return `Periodo: ${item.payload['period']} - Total: ${item.payload['count']}`
           }}
           loading={loading}
-          className="w-[49%]"
+          className="w-full md:w-[49%]"
         />
 
         <PieChartComponent
@@ -92,7 +94,7 @@ export function HomeView({ loading, periods, origins, onSubmit, }: HomeViewProps
           data={origins}
           title="Respostas por origem"
           loading={loading}
-          className="w-[49%]"
+          className="w-full md:w-[49%]"
         />
       </section>
     </div>

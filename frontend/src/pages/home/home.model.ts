@@ -4,6 +4,7 @@ import { Period } from "../../models/period.model";
 import { DashboardService } from "../../services/dashboard/dashboard.service";
 import { TuserResponseSchema } from "@/validators/period.validators";
 import { Origin } from "@/models/origin.model";
+import { INTERVAL_ENUM } from "@/enums/interval.enum";
 
 export const useHomeModel = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
@@ -41,7 +42,7 @@ export const useHomeModel = () => {
   };
 
   useEffect(() => {
-   // onLoad();
+   onLoad({interval: INTERVAL_ENUM.YEAR});
   }, []);
 
   return {

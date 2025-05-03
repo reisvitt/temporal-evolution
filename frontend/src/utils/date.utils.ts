@@ -2,5 +2,5 @@
 export const validateDateFormat = (value?: string): boolean => {
   if (!value) return true; // Permite undefined (opcional)
   const date = new Date(value);
-  return !!date
+  return !isNaN(date.getTime())
 };

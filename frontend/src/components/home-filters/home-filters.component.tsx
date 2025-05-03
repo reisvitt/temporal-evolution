@@ -41,7 +41,7 @@ export const HomeFiltersComponent = ({ onSubmit, loading }: THomeFiltersComponen
   }
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-wrap gap-4 my-4">
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-wrap justify-between my-4">
       <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[19%]">
         <Form.Label>
           Agrupar por:
@@ -99,7 +99,7 @@ export const HomeFiltersComponent = ({ onSubmit, loading }: THomeFiltersComponen
 
       <Button
         type="submit"
-        className="mt-auto min-w-[12rem]"
+        className="w-full mt-4 lg:mt-auto lg:max-w-[19%]"
         disabled={loading}
       >
         {loading ? "Aplicando..." : "Aplicar"}
