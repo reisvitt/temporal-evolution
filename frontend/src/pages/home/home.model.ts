@@ -2,16 +2,17 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { Period } from "../../models/period.model";
 import { DashboardService } from "../../services/dashboard/dashboard.service";
+import { TuserResponseSchema } from "@/validators/period.validators";
 
 export const useHomeModel = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const onLoad = async (): Promise<void> => {
+  const onLoad = async (values?: TuserResponseSchema): Promise<void> => {
     setLoading(true);
     try {
       const service = new DashboardService();
-      const response: Period[] = await service.getPeriod()
+      const response: Period[] = await service.getPeriod(values)
 
       setPeriods(response);
     } catch (error) {
@@ -23,11 +24,12 @@ export const useHomeModel = () => {
   };
 
   useEffect(() => {
-    onLoad();
+   // onLoad();
   }, []);
 
   return {
     periods,
     loading,
+    reload: onLoad
   };
 };
