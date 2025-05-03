@@ -5,9 +5,9 @@ import { usersSurveysResponseParamsSchema } from '../validators/users-surveys-re
 export class UserSurveyResponseAuxController {
   constructor(private userService: UserSurveyResponseAuxService) {}
 
-  async getAllUsersSurveyResponses(req: Request, res: Response) {
+  async getAllUsersSurveyResponses(_: Request, res: Response) {
     const users = await this.userService.getAllUsersSurveysResponses();
-    res.json(users);
+    res.status(200).json(users);
   }
 
   async getUsersSurveyResponsesPeriod(req: Request, res: Response) {
@@ -25,11 +25,17 @@ export class UserSurveyResponseAuxController {
   }
 
   async getUserSurveyResponseById(req: Request, res: Response) {
-    const user = await this.userService.getUserSurveyResponseById(Number(req.params.id));
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ message: 'User not found' });
+    if(!Number(req.params.id)){
+      res.status(400).send()
+      return
     }
+
+    const user = await this.userService.getUserSurveyResponseById(Number(req.params.id));
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return
+    } 
+    
+    res.status(200).json(user);
   }
 }

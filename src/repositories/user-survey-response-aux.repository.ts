@@ -22,7 +22,7 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
     }
 
     if(result.rows.length === 0){
-      throw new Error("Not found")
+      return null
     }
 
     const userR = result.rows[0]
