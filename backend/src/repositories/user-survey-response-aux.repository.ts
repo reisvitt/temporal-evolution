@@ -42,18 +42,18 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
         ($1::TIMESTAMP IS NULL OR created_at >= $1) AND
         ($2::TIMESTAMP IS NULL OR created_at <= $2) AND
         ($3::VARCHAR IS NULL OR origin = $3) AND
-        ($4::INTEGER IS NULL OR status_id = $4)
+        ($4::INTEGER IS NULL OR response_status_id = $4)
       GROUP BY
-          ${groupByClause},
+          period,
           origin,
-          status_id
-      ORDER BY period, origin, status_id
+          response_status_id
+      ORDER BY period, origin, response_status_id
     `;
 
     const values = [
       params.from || null,
       params.to || null,
-      origin || null,
+      params.origin || null,
       params.status || null,
     ]
 
