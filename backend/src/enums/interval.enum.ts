@@ -1,7 +1,7 @@
 export enum INTERVAL_ENUM {
-  WEEK = 'week',
-  MONTH = 'month',
-  QUARTER = 'quarter',
-  SEMESTER = 'semester',
-  YEAR = 'year'
+  WEEK = 'WEEK',
+  MONTH = 'MONTH',
+  QUARTER = 'QUARTER',
+  SEMESTER = 'SEMESTER',
+  YEAR = 'YEAR'
 }
