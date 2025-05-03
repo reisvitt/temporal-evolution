@@ -5,7 +5,8 @@ TABLE_NAME="inside.users_surveys_responses_aux"
 
 # Cria tabelas se nao existirem
 psql $DATABASE_URL -f /usr/src/app/scripts/create_temp_table.sql
-psql $DATABASE_URL -f /usr/src/app/scripts/create_normal_table.sql
+psql $DATABASE_URL -f /usr/src/app/scripts/create_partitions.sql
+psql $DATABASE_URL -f /usr/src/app/scripts/create_partitions_indexes.sql
 
 # Verifica se a tabela temporária está vazia
 COUNT_TEMP_TABLE=$(psql $DATABASE_URL -t -c "SELECT COUNT(*) FROM $TEMP_TABLE_NAME;")
@@ -44,7 +45,7 @@ if [ "$COUNT" -eq 0 ]; then
       origin,
       response_status_id,
       NOW() - INTERVAL '10 years' * random() as created_at
-    FROM $TEMP_TABLE_NAME LIMIT 2000000;"
+    FROM $TEMP_TABLE_NAME LIMIT 1000;"
 
   echo "Itens inseridos com sucesso na tabela $TABLE_NAME."
 else
