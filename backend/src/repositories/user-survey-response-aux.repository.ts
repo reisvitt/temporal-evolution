@@ -1,9 +1,10 @@
 import { Pool } from "pg";
 import { UserSurveyResponseRepository } from "../interfaces/user-survey-response-aux-repository.interface";
 import { UserSurveyResponseAux } from "../models/user-survey-response-aux.model";
-import { TUsersSurveysResponseParams } from "../validators/users-surveys-response.params.validators";
+import { TUsersSurveysResponseByOrigin, TUsersSurveysResponseParams } from "../validators/users-surveys-response.params.validators";
 import { INTERVAL_ENUM } from "../enums/interval.enum";
 import { UserSurveyResponsePeriod } from "../models/user-survey-response-period.model";
+import { UserSurveyResponseOrigin } from "../models/user-survey-response-origin.model";
 
 export class UserSurveyResponseAuxRepository implements UserSurveyResponseRepository {
 
@@ -30,7 +31,37 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
     return userR ? new UserSurveyResponseAux(userR.id, userR.origin, userR.responseStatusId, userR.createdAt) : null;
   }
 
-  async withParams(params: TUsersSurveysResponseParams): Promise<UserSurveyResponsePeriod[]> {
+  async byOrigin(params: TUsersSurveysResponseByOrigin): Promise<UserSurveyResponseOrigin[]> {
+    let query = `
+      SELECT 
+        origin,
+        COUNT(*) AS count
+      FROM inside.users_surveys_responses_aux
+      WHERE
+        ($1::TIMESTAMP IS NULL OR created_at >= $1) AND
+        ($2::TIMESTAMP IS NULL OR created_at <= $2) AND
+        ($3::VARCHAR IS NULL OR origin = $3) AND
+        ($4::INTEGER IS NULL OR response_status_id = $4)
+      GROUP BY origin
+      ORDER BY origin
+    `;
+
+    const values = [
+      params.from || null,
+      params.to || null,
+      params.origin || null,
+      params.status || null,
+    ]
+
+    const { rows } = await this.database.query(query, values);
+
+    return (rows as any[]).map((row) => ({
+      origin: row.origin,
+      count: parseInt(row.count),
+    }));
+  }
+
+  async byPeriod(params: TUsersSurveysResponseParams): Promise<UserSurveyResponsePeriod[]> {
     const groupByClause = this.getGroupByClause(params.interval);
     
     let query = `
@@ -43,11 +74,8 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
         ($2::TIMESTAMP IS NULL OR created_at <= $2) AND
         ($3::VARCHAR IS NULL OR origin = $3) AND
         ($4::INTEGER IS NULL OR response_status_id = $4)
-      GROUP BY
-          period,
-          origin,
-          response_status_id
-      ORDER BY period, origin, response_status_id
+      GROUP BY period
+      ORDER BY period
     `;
 
     const values = [
@@ -57,10 +85,8 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
       params.status || null,
     ]
 
-    console.log("query", query)
-    console.log("values", values)
-
     const { rows } = await this.database.query(query, values);
+
     return (rows as any[]).map((row) => ({
       period: row.period,
       count: parseInt(row.count),

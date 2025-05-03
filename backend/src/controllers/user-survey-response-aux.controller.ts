@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserSurveyResponseAuxService } from '../services/user-survey-response-aux.service';
-import { usersSurveysResponseParamsSchema } from '../validators/users-surveys-response.params.validators';
+import { usersSurveysResponseByOriginSchema, usersSurveysResponseParamsSchema } from '../validators/users-surveys-response.params.validators';
 
 export class UserSurveyResponseAuxController {
   constructor(private userService: UserSurveyResponseAuxService) {}
@@ -20,7 +20,21 @@ export class UserSurveyResponseAuxController {
       return
     }
 
-    const users = await this.userService.getUsersSurveysResponsesFilters(parsed.data);
+    const users = await this.userService.getUsersSurveysResponsesByPeriod(parsed.data);
+    res.status(200).json(users);
+  }
+
+  async getUsersSurveyResponsesOrigin(req: Request, res: Response) {
+    const parsed = usersSurveysResponseByOriginSchema.safeParse(req.query)
+
+    if(!parsed?.success){
+      res.status(400).json({
+        message: parsed.error.errors.map(error => error.message).join("; "),
+      })
+      return
+    }
+
+    const users = await this.userService.getUsersSurveysResponsesByOrigin(parsed.data);
     res.status(200).json(users);
   }
 

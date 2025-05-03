@@ -32,7 +32,7 @@ describe('UserSurveyResponseAuxController', () => {
       }
       return Promise.resolve(null);
     })
-    mockService.getUsersSurveysResponsesFilters.mockResolvedValue(userSurveyResponsePeriodMock)
+    mockService.getUsersSurveysResponsesByPeriod.mockResolvedValue(userSurveyResponsePeriodMock)
   })
 
   afterEach(() => {
@@ -90,7 +90,7 @@ describe('UserSurveyResponseAuxController', () => {
       mockRequest.query = {}
       await controller.getUsersSurveyResponsesPeriod(mockRequest as Request, mockResponse as Response)
 
-      expect(mockService.getUsersSurveysResponsesFilters).toHaveBeenCalled()
+      expect(mockService.getUsersSurveysResponsesByPeriod).toHaveBeenCalled()
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(userSurveyResponsePeriodMock);
     });
@@ -101,7 +101,7 @@ describe('UserSurveyResponseAuxController', () => {
       }
       await controller.getUsersSurveyResponsesPeriod(mockRequest as Request, mockResponse as Response)
 
-      expect(mockService.getUsersSurveysResponsesFilters).not.toHaveBeenCalled()
+      expect(mockService.getUsersSurveysResponsesByPeriod).not.toHaveBeenCalled()
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalled()
     });
