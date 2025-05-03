@@ -35,7 +35,8 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
     let query = `
       SELECT 
         origin,
-        COUNT(*) AS count
+        COUNT(*) AS count,
+        (SELECT COUNT(*) as total FROM inside.users_surveys_responses_aux) as total
       FROM inside.users_surveys_responses_aux
       WHERE
         ($1::TIMESTAMP IS NULL OR created_at >= $1) AND
@@ -58,6 +59,7 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
     return (rows as any[]).map((row) => ({
       origin: row.origin,
       count: parseInt(row.count),
+      total: parseInt(row.total)
     }));
   }
 
