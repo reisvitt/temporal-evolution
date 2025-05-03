@@ -11,7 +11,7 @@ type TInputDate = {
   onChange?: (value: any) => void
 } & CalendarProps
 
-export const InputDate = ({ value, onChange, className, ...props }: TInputDate) => {
+export const InputDate = ({ value, onChange, className }: TInputDate) => {
 
   return (
     <Popover>
@@ -19,7 +19,7 @@ export const InputDate = ({ value, onChange, className, ...props }: TInputDate) 
         <Button
           className={cn(
             "w-full border bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
-            !props.selected && "text-gray-900 text-xs",
+            !value && "text-gray-900 text-xs",
             className,
           )}
         >
@@ -36,7 +36,6 @@ export const InputDate = ({ value, onChange, className, ...props }: TInputDate) 
           onSelect={onChange}
           selected={value}
           mode="single"
-          initialFocus
         />
       </PopoverContent>
     </Popover>
