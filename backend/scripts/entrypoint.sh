@@ -55,7 +55,7 @@ if [ "$COUNT" -eq 0 ]; then
       origin,
       response_status_id,
       NOW() - INTERVAL '10 years' * random() as created_at
-    FROM $TEMP_TABLE_NAME LIMIT 1000;"
+    FROM $TEMP_TABLE_NAME"
 
   echo "Itens inseridos com sucesso na tabela $TABLE_NAME."
 else
