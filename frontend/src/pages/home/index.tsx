@@ -2,7 +2,7 @@ import { useHomeModel } from "./home.model";
 import { HomeView } from "./home.view";
 
 const HomePage = () => {
-  const { loading, periods, originPeriodCount, origins, reload } = useHomeModel()
+  const { loading, periods, statusPeriodCount, originPeriodCount, origins, reload } = useHomeModel()
   return (
     <HomeView
       loading={loading}
@@ -10,6 +10,7 @@ const HomePage = () => {
       onSubmit={reload}
       origins={origins}
       originPeriodCount={originPeriodCount}
+      statusPeriodCount={statusPeriodCount}
     />
   )
 };

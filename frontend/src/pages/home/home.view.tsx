@@ -12,6 +12,7 @@ export function HomeView({
   loading,
   periods,
   originPeriodCount,
+  statusPeriodCount,
   origins,
   onSubmit
 }: HomeViewProps) {
@@ -124,6 +125,20 @@ export function HomeView({
           labelFormatter={(data) => {
             return `${originEnumLabels[data.origin as ORIGIN_ENUM]}: ${data['percent']}%`
           }}
+        />
+
+        <LineChartMultipleComponent
+          xAxisKey="period"
+          config={{
+            count: {
+              label: "Total",
+              color: "hsl(var(--chart-1))",
+            },
+          }}
+          data={statusPeriodCount}
+          title="Evolução dos Registros por Status"
+          loading={loading}
+          className="w-full md:w-[49%]"
         />
       </section>
     </div>

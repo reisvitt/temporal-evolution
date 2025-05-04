@@ -18,4 +18,7 @@ router.get('/dashboard/users-surveys-responses/origin',
 router.get('/dashboard/users-surveys-responses/origin-period', 
   (req, res) => userController.getUserSurveyResponseOriginByPeriodCount(req, res));
 
+router.get('/dashboard/users-surveys-responses/status-period', 
+  (req, res) => userController.getUserSurveyResponseStatusByPeriodCount(req, res));
+
 export { router as userSurveyResponseRouter };

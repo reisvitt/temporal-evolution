@@ -5,6 +5,7 @@ import { TUsersSurveysResponseByOrigin, TUsersSurveysResponseParams } from "../v
 import { INTERVAL_ENUM } from "../enums/interval.enum";
 import { UserSurveyResponsePeriod } from "../models/user-survey-response-period.model";
 import { UserSurveyResponseOrigin } from "../models/user-survey-response-origin.model";
+import { STATUS_ENUM, statusEnumLabels } from "../enums/status.enum";
 
 export class UserSurveyResponseAuxRepository implements UserSurveyResponseRepository {
 
@@ -90,6 +91,41 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
       params.from || null,
       params.to || null,
       params.status || null,
+    ]
+
+    const { rows } = await this.database.query(query2, values);
+
+    return (rows as any[]).map((row) => ({
+      ...row,
+      period: row.period,
+    }));
+  }
+
+  async statusByPeriodCount(params: TUsersSurveysResponseParams): Promise<UserSurveyResponseOrigin[]> {
+    const status = Object.keys(statusEnumLabels)
+    const statusCountQuery = status.map(stat => `COUNT(CASE WHEN response_status_id = ${stat} THEN 1 END)::BIGINT AS ${statusEnumLabels[stat as unknown as STATUS_ENUM]}`)
+
+    const groupByClause = this.getGroupByClause(params.interval);
+    
+    let query2 = `
+      SELECT 
+        ${groupByClause},
+        ${statusCountQuery.join(", ")}
+      FROM inside.users_surveys_responses_aux
+      WHERE
+        ($1::TIMESTAMP IS NULL OR created_at >= $1) AND
+        ($2::TIMESTAMP IS NULL OR created_at <= $2) AND
+        ($3::VARCHAR IS NULL OR origin = $3)
+      GROUP BY period
+      ORDER BY period
+    `;
+
+    console.log('query', query2)
+
+    const values = [
+      params.from || null,
+      params.to || null,
+      params.origin || null,
     ]
 
     const { rows } = await this.database.query(query2, values);

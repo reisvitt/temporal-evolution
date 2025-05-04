@@ -5,12 +5,13 @@ import { DashboardService } from "../../services/dashboard/dashboard.service";
 import { TuserResponseSchema } from "@/validators/period.validators";
 import { Origin } from "@/models/origin.model";
 import { INTERVAL_ENUM } from "@/enums/interval.enum";
-import { OriginPeriodCount } from "@/models/origin-period-count.model";
+import { GenericPeriodCount } from "@/models/generic-period-count.model";
 
 export const useHomeModel = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [origins, setOrigins] = useState<Origin[]>([]);
-  const [originPeriodCount, setOriginPeriodCount] = useState<OriginPeriodCount[]>([]);
+  const [originPeriodCount, setOriginPeriodCount] = useState<GenericPeriodCount[]>([]);
+  const [statusPeriodCount, setStatusPeriodCount] = useState<GenericPeriodCount[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const onLoad = async (values?: TuserResponseSchema): Promise<void> => {
@@ -23,6 +24,7 @@ export const useHomeModel = () => {
     allRequests.push(service.getPeriod(values))
     allRequests.push(service.getOrigin(values))
     allRequests.push(service.getOriginPeriodCount(values))
+    allRequests.push(service.getStatusPeriodCount(values))
 
     const result = await Promise.allSettled(allRequests)
 
@@ -40,7 +42,10 @@ export const useHomeModel = () => {
           setOrigins(request.value as Origin[])
           break;
         case 2: 
-        setOriginPeriodCount(request.value as OriginPeriodCount[])
+        setOriginPeriodCount(request.value as GenericPeriodCount[])
+          break;
+        case 3: 
+        setStatusPeriodCount(request.value as GenericPeriodCount[])
           break;
       }
     })
@@ -55,6 +60,7 @@ export const useHomeModel = () => {
     periods,
     origins,
     originPeriodCount,
+    statusPeriodCount,
     loading,
     reload: onLoad
   };

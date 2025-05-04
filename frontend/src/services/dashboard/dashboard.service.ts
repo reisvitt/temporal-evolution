@@ -3,7 +3,7 @@ import { Period } from "../../models/period.model";
 import { Origin } from "@/models/origin.model";
 import { TuserResponseOriginSchema, TuserResponseSchema } from "../../validators/period.validators";
 import { api } from "../api";
-import { OriginPeriodCount } from "@/models/origin-period-count.model";
+import { GenericPeriodCount } from "@/models/generic-period-count.model";
 
 export class DashboardService {
   private api: Axios
@@ -29,12 +29,25 @@ export class DashboardService {
     return result.data
   }
 
-  async getOriginPeriodCount(params?: TuserResponseSchema): Promise<OriginPeriodCount[]>{
-    const result = await this.api.get<OriginPeriodCount[]>("/dashboard/users-surveys-responses/origin-period", { 
+  async getOriginPeriodCount(params?: TuserResponseSchema): Promise<GenericPeriodCount[]>{
+    const result = await this.api.get<GenericPeriodCount[]>("/dashboard/users-surveys-responses/origin-period", { 
       params: {
         from: params?.from,
         to: params?.to,
         status: params?.status,
+        interval: params?.interval,
+      }
+     })
+
+    return result.data
+  }
+
+  async getStatusPeriodCount(params?: TuserResponseSchema): Promise<GenericPeriodCount[]>{
+    const result = await this.api.get<GenericPeriodCount[]>("/dashboard/users-surveys-responses/status-period", { 
+      params: {
+        from: params?.from,
+        to: params?.to,
+        origin: params?.origin,
         interval: params?.interval,
       }
      })

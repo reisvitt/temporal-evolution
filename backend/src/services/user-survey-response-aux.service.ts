@@ -26,4 +26,8 @@ export class UserSurveyResponseAuxService {
   async getUserSurveyResponseOriginByPeriodCount(params: TUsersSurveysResponseParams): Promise<UserSurveyResponseOrigin[]> {
     return this.userRepository.originByPeriodCount(params);
   }
+
+  async getUserSurveyResponseStatusByPeriodCount(params: TUsersSurveysResponseParams): Promise<UserSurveyResponseOrigin[]> {
+    return this.userRepository.statusByPeriodCount(params);
+  }
 }
