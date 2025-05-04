@@ -3,8 +3,9 @@ import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "./button"
 import { Calendar, CalendarProps } from "./calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "./popover"
+import { Popover, PopoverContent, PopoverTrigger, } from "./popover"
 import { format } from "date-fns"
+import { useState } from "react"
 
 type TInputDate = {
   value?: Date
@@ -12,14 +13,18 @@ type TInputDate = {
 } & CalendarProps
 
 export const InputDate = ({ value, onChange, className }: TInputDate) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
   return (
-    <Popover>
+    <Popover
+      open={isOpen}
+      onOpenChange={(open) => setIsOpen(open)}>
       <PopoverTrigger asChild>
         <Button
           className={cn(
-            "w-full border bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
-            !value && "text-gray-900 text-xs",
+            "w-full border bg-inherit hover:bg-white hover:border-gray-300 [&_svg]:pointer-events-auto text-xs",
+            !value && "text-muted-foreground",
+            !!value && "text-foreground",
             className,
           )}
         >
@@ -37,6 +42,18 @@ export const InputDate = ({ value, onChange, className }: TInputDate) => {
           selected={value}
           mode="single"
         />
+        <Button
+          className="w-full"
+          variant="outline"
+          onClick={() => {
+            setIsOpen(false)
+            if (onChange) {
+              onChange(undefined)
+            }
+          }}
+        >
+          Limpar
+        </Button>
       </PopoverContent>
     </Popover>
   )

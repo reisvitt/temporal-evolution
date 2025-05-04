@@ -7,6 +7,8 @@ import { ORIGIN_ENUM, originEnumLabels } from "@/enums/origin.enum";
 import { RadialChartComponent } from "@/components/radial-chart";
 import { LineChartMultipleComponent } from "@/components/line-chart-multiple";
 import { getThemeValue } from "@/utils/theme";
+import { DialogInfo } from "@/components/dialog-info";
+import { DevBy } from "@/components/dev-by";
 
 export function HomeView({
   loading,
@@ -20,13 +22,16 @@ export function HomeView({
   return (
     <div className="page home-page px-4 lg:px-0">
 
-      <h1 className="my-10 text-center font-bold text-2xl text-gray-700">
+      <h1 className="mt-10 text-center font-bold text-2xl text-gray-700">
         Evolução Temporal da Taxa de Conversão
       </h1>
 
-      <p className="mb-8 text-center">
-        Registros sobre envios de canais (E-mail, WhatsApp, e Push Notifications).
-      </p>
+      <div className="mb-8 mt-4 flex justify-center items-end gap-2">
+        <span className="text-sm">
+          Registros sobre envios de canais (E-mail, WhatsApp, e Push Notifications).
+        </span>
+        <DialogInfo />
+      </div>
 
       <HomeFiltersComponent
         onSubmit={onSubmit}
@@ -119,7 +124,7 @@ export function HomeView({
             ...origin,
             percent: Number(((100 * origin.count) / origin.total).toFixed(2))
           }))}
-          title="Percentual por Origem"
+          title="Percentual por Canal"
           loading={loading}
           className="w-full md:w-[49%]"
           labelFormatter={(data) => {
@@ -141,6 +146,10 @@ export function HomeView({
           className="w-full md:w-[49%]"
         />
       </section>
+
+      <footer className="mt-20 mb-12">
+        <DevBy />
+      </footer>
     </div>
   )
 }

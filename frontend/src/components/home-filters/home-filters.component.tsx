@@ -60,7 +60,7 @@ export const HomeFiltersComponent = ({ onSubmit, loading }: THomeFiltersComponen
       </Form.Field>
       <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[16%]">
         <Form.Label>
-          Filtrar por Origem:
+          Filtrar por Canal:
         </Form.Label>
         <Select
           options={originEnumOptions}
@@ -74,7 +74,7 @@ export const HomeFiltersComponent = ({ onSubmit, loading }: THomeFiltersComponen
       </Form.Field>
       <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[16%]">
         <Form.Label>
-          Filtrar por status:
+          Filtrar por Status:
         </Form.Label>
         <Select
           options={statusEnumOptions}

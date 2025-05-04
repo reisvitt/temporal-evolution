@@ -162,3 +162,23 @@
 .blink {
   animation: blink 2s ease-in-out alternate infinite;
 }
+
+::-webkit-scrollbar {
+  width: 0.750rem;
+  height: 0.750rem;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 1rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray-400); 
+  border-radius: 1rem;
+  border: 2px solid #f1f1f1; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-500);
+}
