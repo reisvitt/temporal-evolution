@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 
 import {
   Card,
@@ -15,11 +15,11 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Loading } from "../ui/loading"
+import { getThemeValue } from "@/utils/theme"
 
-type TBarChartComponent = {
+type TLineChartMultipleComponent = {
   title?: string
   xAxisKey: string
-  barKey: string
   config: ChartConfig,
   data: any[]
   formatterTooltip?: (value: any, name: string, item: any) => string
@@ -27,16 +27,28 @@ type TBarChartComponent = {
   className?: string,
 }
 
-export const BarChartComponent = ({
+export const LineChartMultipleComponent = ({
   title,
   xAxisKey,
-  barKey,
   config,
   data,
   formatterTooltip,
   loading,
   className,
-}: TBarChartComponent) => {
+}: TLineChartMultipleComponent) => {
+
+  const getKeys = (): string[] => {
+    if (!data || data.length === 0) return []
+
+    const first = data[0]
+
+    if (!first) return []
+
+    delete first[xAxisKey]
+
+    return Object.keys(first)
+  }
+
   return (
     <Card className={className}>
       <CardHeader >
@@ -52,25 +64,44 @@ export const BarChartComponent = ({
 
         {data && data.length > 0 && (
           <ChartContainer config={config}>
-            <BarChart accessibilityLayer data={data}>
+            <LineChart
+              accessibilityLayer
+              data={data}
+              margin={{
+                top: 20,
+                left: 12,
+                right: 12,
+              }}
+            >
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey={xAxisKey}
                 tickLine={false}
-                tickMargin={10}
                 axisLine={false}
+                tickMargin={8}
               />
               <ChartTooltip
                 cursor={false}
-                content={<ChartTooltipContent />}
+                content={<ChartTooltipContent indicator="line" hideLabel />}
                 formatter={formatterTooltip}
               />
-              <Bar
-                dataKey={barKey}
-                fill="var(--color-primary)"
-                radius={8}
-              />
-            </BarChart>
+              {getKeys().map(key => (
+                <Line
+                  key={key}
+                  dataKey={key}
+                  type="natural"
+                  stroke={getThemeValue(`color-${key}`) || getThemeValue("color-primary")}
+                  strokeWidth={2}
+                  dot={{
+                    fill: getThemeValue(`color-${key}`) || getThemeValue("color-primary"),
+                  }}
+                  activeDot={{
+                    r: 6,
+                  }}
+                >
+                </Line>
+              ))}
+            </LineChart>
           </ChartContainer>
         )}
       </CardContent>

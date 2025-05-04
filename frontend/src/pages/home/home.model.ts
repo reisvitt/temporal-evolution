@@ -5,10 +5,12 @@ import { DashboardService } from "../../services/dashboard/dashboard.service";
 import { TuserResponseSchema } from "@/validators/period.validators";
 import { Origin } from "@/models/origin.model";
 import { INTERVAL_ENUM } from "@/enums/interval.enum";
+import { OriginPeriodCount } from "@/models/origin-period-count.model";
 
 export const useHomeModel = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [origins, setOrigins] = useState<Origin[]>([]);
+  const [originPeriodCount, setOriginPeriodCount] = useState<OriginPeriodCount[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const onLoad = async (values?: TuserResponseSchema): Promise<void> => {
@@ -20,6 +22,7 @@ export const useHomeModel = () => {
 
     allRequests.push(service.getPeriod(values))
     allRequests.push(service.getOrigin(values))
+    allRequests.push(service.getOriginPeriodCount(values))
 
     const result = await Promise.allSettled(allRequests)
 
@@ -36,6 +39,9 @@ export const useHomeModel = () => {
         case 1: 
           setOrigins(request.value as Origin[])
           break;
+        case 2: 
+        setOriginPeriodCount(request.value as OriginPeriodCount[])
+          break;
       }
     })
     setLoading(false);
@@ -48,6 +54,7 @@ export const useHomeModel = () => {
   return {
     periods,
     origins,
+    originPeriodCount,
     loading,
     reload: onLoad
   };

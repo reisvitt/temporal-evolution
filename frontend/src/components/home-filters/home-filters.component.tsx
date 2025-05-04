@@ -6,6 +6,7 @@ import { ORIGIN_ENUM, originEnumOptions } from "@/enums/origin.enum"
 import Form from "../ui/form"
 import { Button } from "../ui/button"
 import { format } from "date-fns"
+import { STATUS_ENUM, statusEnumOptions } from "@/enums/status.enum"
 
 type THomeFiltersComponent = {
   onSubmit: (values: TuserResponseSchema) => void
@@ -22,7 +23,8 @@ export const HomeFiltersComponent = ({ onSubmit, loading }: THomeFiltersComponen
   const handleSubmit = (values: TuserResponseSchema) => {
     const mapped = {
       interval: values.interval,
-      origin: values.origin
+      origin: values.origin,
+      status: values.status,
     }
 
     if (values.to) {
@@ -42,7 +44,7 @@ export const HomeFiltersComponent = ({ onSubmit, loading }: THomeFiltersComponen
 
   return (
     <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-wrap justify-between my-4">
-      <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[19%]">
+      <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[16%]">
         <Form.Label>
           Agrupar por:
         </Form.Label>
@@ -56,9 +58,9 @@ export const HomeFiltersComponent = ({ onSubmit, loading }: THomeFiltersComponen
           <Form.Error>{form.formState.errors.interval?.message}</Form.Error>
         )}
       </Form.Field>
-      <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[19%]">
+      <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[16%]">
         <Form.Label>
-          Origem:
+          Filtrar por Origem:
         </Form.Label>
         <Select
           options={originEnumOptions}
@@ -70,7 +72,21 @@ export const HomeFiltersComponent = ({ onSubmit, loading }: THomeFiltersComponen
           <Form.Error>{form.formState.errors.origin?.message}</Form.Error>
         )}
       </Form.Field>
-      <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[19%]">
+      <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[16%]">
+        <Form.Label>
+          Filtrar por status:
+        </Form.Label>
+        <Select
+          options={statusEnumOptions}
+          onValueChange={(value?: string) => form.setValue("status", value as unknown as STATUS_ENUM)}
+          className="w-full bg-white"
+          value={form.watch("status")}
+        />
+        {form.formState.errors.status && (
+          <Form.Error>{form.formState.errors.status?.message}</Form.Error>
+        )}
+      </Form.Field>
+      <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[16%]">
         <Form.Label>
           Data de:
         </Form.Label>
@@ -83,7 +99,7 @@ export const HomeFiltersComponent = ({ onSubmit, loading }: THomeFiltersComponen
           <Form.Error>{form.formState.errors.from?.message}</Form.Error>
         )}
       </Form.Field>
-      <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[19%]">
+      <Form.Field className="w-full md:max-w-[12rem] lg:max-w-[16%]">
         <Form.Label>
           Data até:
         </Form.Label>
@@ -99,7 +115,7 @@ export const HomeFiltersComponent = ({ onSubmit, loading }: THomeFiltersComponen
 
       <Button
         type="submit"
-        className="w-full mt-4 lg:mt-auto lg:max-w-[19%]"
+        className="w-full mt-4 lg:mt-auto lg:max-w-[16%]"
         disabled={loading}
       >
         {loading ? "Aplicando..." : "Aplicar"}

@@ -22,7 +22,7 @@ type TLineChartComponent = {
   lineKey: string
   config: ChartConfig,
   data: any[]
-  formatterTooltip: (value: any, name: string, item: any) => string
+  formatterTooltip?: (value: any, name: string, item: any) => string
   loading?: boolean
   className?: string,
 }

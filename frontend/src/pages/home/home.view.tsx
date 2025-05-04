@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { BarChartComponent } from "@/components/bar-chart";
 import { HomeFiltersComponent } from "../../components/home-filters/home-filters.component";
 import { HomeViewProps } from "./home.type";
@@ -6,14 +5,27 @@ import { LineChartComponent } from "@/components/line-chart";
 import { PieChartComponent } from "@/components/pie-chart";
 import { ORIGIN_ENUM, originEnumLabels } from "@/enums/origin.enum";
 import { RadialChartComponent } from "@/components/radial-chart";
+import { LineChartMultipleComponent } from "@/components/line-chart-multiple";
+import { getThemeValue } from "@/utils/theme";
 
-export function HomeView({ loading, periods, origins, onSubmit, }: HomeViewProps) {
-
+export function HomeView({
+  loading,
+  periods,
+  originPeriodCount,
+  origins,
+  onSubmit
+}: HomeViewProps) {
 
   return (
     <div className="page home-page px-4 lg:px-0">
 
-      <h1 className="my-10 text-center font-bold text-2xl text-gray-700">Evolução Temporal</h1>
+      <h1 className="my-10 text-center font-bold text-2xl text-gray-700">
+        Evolução Temporal da Taxa de Conversão
+      </h1>
+
+      <p className="mb-8 text-center">
+        Registros sobre envios de canais (E-mail, WhatsApp, e Push Notifications).
+      </p>
 
       <HomeFiltersComponent
         onSubmit={onSubmit}
@@ -30,15 +42,30 @@ export function HomeView({ loading, periods, origins, onSubmit, }: HomeViewProps
               },
             }}
             value={origin.count}
-            color={`var(--color-primary)`}
+            color={getThemeValue(`color-${origin.origin}`)}
             total={origin.total || 1}
             label={originEnumLabels[origin.origin as ORIGIN_ENUM]}
-            title={`Quantidade - ${originEnumLabels[origin.origin as ORIGIN_ENUM]}`}
+            title={`Total de Registros por: ${originEnumLabels[origin.origin as ORIGIN_ENUM]}`}
             loading={loading}
             className={`w-full md:data-[length='1']:w-[49%] md:data-[length='3']:w-[32%]`}
             data-length={origins.length}
           />
         ))}
+
+        <LineChartMultipleComponent
+          xAxisKey="period"
+          config={{
+            count: {
+              label: "Total",
+              color: "hsl(var(--chart-1))",
+            },
+          }}
+          data={originPeriodCount}
+          title="Evolução dos Registros por Origem"
+          loading={loading}
+          className="w-full md:w-[49%]"
+        />
+
         <BarChartComponent
           xAxisKey="period"
           barKey="count"
@@ -49,13 +76,11 @@ export function HomeView({ loading, periods, origins, onSubmit, }: HomeViewProps
             },
           }}
           data={periods}
-          title="Respostas dos usuários"
-          formatterTooltip={(_1: any, _2: any, item: any) => {
-            return `Periodo: ${item.payload['period']} - Total: ${item.payload['count']}`
-          }}
+          title="Somatório"
           loading={loading}
           className="w-full md:w-[49%]"
         />
+
         <LineChartComponent
           xAxisKey="period"
           lineKey="count"
@@ -66,16 +91,14 @@ export function HomeView({ loading, periods, origins, onSubmit, }: HomeViewProps
             },
           }}
           data={periods}
-          title="Respostas dos usuários"
-          formatterTooltip={(_1: any, _2: any, item: any) => {
-            return `Periodo: ${item.payload['period']} - Total: ${item.payload['count']}`
-          }}
+          title="Evolução dos Registros"
+
           loading={loading}
           className="w-full md:w-[49%]"
         />
 
         <PieChartComponent
-          dataKey="count"
+          dataKey="percent"
           nameKey="origin"
           config={{
             [ORIGIN_ENUM.EMAIL]: {
@@ -91,10 +114,16 @@ export function HomeView({ loading, periods, origins, onSubmit, }: HomeViewProps
               color: "var(--color-wpp)",
             },
           }}
-          data={origins}
-          title="Respostas por origem"
+          data={origins.map(origin => ({
+            ...origin,
+            percent: Number(((100 * origin.count) / origin.total).toFixed(2))
+          }))}
+          title="Percentual por Origem"
           loading={loading}
           className="w-full md:w-[49%]"
+          labelFormatter={(data) => {
+            return `${originEnumLabels[data.origin as ORIGIN_ENUM]}: ${data['percent']}%`
+          }}
         />
       </section>
     </div>
