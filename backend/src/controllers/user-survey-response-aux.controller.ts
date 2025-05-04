@@ -38,6 +38,20 @@ export class UserSurveyResponseAuxController {
     res.status(200).json(users);
   }
 
+  async getUserSurveyResponseOriginByPeriodCount(req: Request, res: Response) {
+    const parsed = usersSurveysResponseParamsSchema.safeParse(req.query)
+
+    if(!parsed?.success){
+      res.status(400).json({
+        message: parsed.error.errors.map(error => error.message).join("; "),
+      })
+      return
+    }
+
+    const users = await this.userService.getUserSurveyResponseOriginByPeriodCount(parsed.data);
+    res.status(200).json(users);
+  }
+
   async getUserSurveyResponseById(req: Request, res: Response) {
     if(!Number(req.params.id)){
       res.status(400).send()

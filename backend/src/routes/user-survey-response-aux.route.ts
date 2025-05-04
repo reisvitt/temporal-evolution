@@ -13,6 +13,9 @@ const router = express.Router();
 router.get('/users-surveys-responses', (req, res) => userController.getAllUsersSurveyResponses(req, res));
 router.get('/users-surveys-responses/:id', (req, res) => userController.getUserSurveyResponseById(req, res));
 router.get('/dashboard/users-surveys-responses/period', (req, res) => userController.getUsersSurveyResponsesPeriod(req, res));
-router.get('/dashboard/users-surveys-responses/origin', (req, res) => userController.getUsersSurveyResponsesOrigin(req, res));
+router.get('/dashboard/users-surveys-responses/origin', 
+  (req, res) => userController.getUsersSurveyResponsesOrigin(req, res));
+router.get('/dashboard/users-surveys-responses/origin-period', 
+  (req, res) => userController.getUserSurveyResponseOriginByPeriodCount(req, res));
 
 export { router as userSurveyResponseRouter };

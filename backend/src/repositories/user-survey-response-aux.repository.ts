@@ -35,8 +35,8 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
     let query = `
       SELECT 
         origin,
-        COUNT(*) AS count,
-        (SELECT COUNT(*) as total FROM inside.users_surveys_responses_aux) as total
+        COUNT(*)::BIGINT AS count,
+        (SELECT COUNT(*) as total FROM inside.users_surveys_responses_aux)::BIGINT as total
       FROM inside.users_surveys_responses_aux
       WHERE
         ($1::TIMESTAMP IS NULL OR created_at >= $1) AND
@@ -56,10 +56,47 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
 
     const { rows } = await this.database.query(query, values);
 
+    return rows;
+  }
+
+  async originByPeriodCount(params: TUsersSurveysResponseParams): Promise<UserSurveyResponseOrigin[]> {
+    let query = `
+      SELECT origin FROM inside.users_surveys_responses_aux
+        GROUP BY origin
+        ORDER BY origin
+    `;
+
+    const resultOrigin = await this.database.query(query);
+
+    const origins = resultOrigin.rows.map(row => row.origin)
+    const originCountQuery = origins.map(origin => `COUNT(CASE WHEN origin = '${origin}' THEN 1 END)::BIGINT AS ${origin}`)
+
+    const groupByClause = this.getGroupByClause(params.interval);
+    
+    let query2 = `
+      SELECT 
+        ${groupByClause},
+        ${originCountQuery.join(", ")}
+      FROM inside.users_surveys_responses_aux
+      WHERE
+        ($1::TIMESTAMP IS NULL OR created_at >= $1) AND
+        ($2::TIMESTAMP IS NULL OR created_at <= $2) AND
+        ($3::INTEGER IS NULL OR response_status_id = $3)
+      GROUP BY period
+      ORDER BY period
+    `;
+
+    const values = [
+      params.from || null,
+      params.to || null,
+      params.status || null,
+    ]
+
+    const { rows } = await this.database.query(query2, values);
+
     return (rows as any[]).map((row) => ({
-      origin: row.origin,
-      count: parseInt(row.count),
-      total: parseInt(row.total)
+      ...row,
+      period: row.period,
     }));
   }
 
@@ -69,7 +106,7 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
     let query = `
       SELECT 
         ${groupByClause},
-        COUNT(*) AS count
+        COUNT(*)::BIGINT AS count
       FROM inside.users_surveys_responses_aux
       WHERE
         ($1::TIMESTAMP IS NULL OR created_at >= $1) AND
@@ -89,10 +126,7 @@ export class UserSurveyResponseAuxRepository implements UserSurveyResponseReposi
 
     const { rows } = await this.database.query(query, values);
 
-    return (rows as any[]).map((row) => ({
-      period: row.period,
-      count: parseInt(row.count),
-    }));
+    return rows;
   }
 
   // Função para gerar cláusula de agrupamento com base no intervalo

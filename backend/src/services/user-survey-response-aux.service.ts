@@ -22,4 +22,8 @@ export class UserSurveyResponseAuxService {
   async getUserSurveyResponseById(id: number): Promise<UserSurveyResponseAux | null> {
     return this.userRepository.findById(id);
   }
+
+  async getUserSurveyResponseOriginByPeriodCount(params: TUsersSurveysResponseParams): Promise<UserSurveyResponseOrigin[]> {
+    return this.userRepository.originByPeriodCount(params);
+  }
 }

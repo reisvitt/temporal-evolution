@@ -1,5 +1,8 @@
-import { Pool } from 'pg';
+import { Pool, types } from 'pg';
  import dotenv from 'dotenv';
+ 
+// Configura o parser para BIGINT
+types.setTypeParser(types.builtins.INT8, parseInt);
  
  dotenv.config();
  
