@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-active-green.svg)]()
 
-Um sistema completo para monitoramento e análise de envios de mensagens por canais (E-mail, WhatsApp e Push Notification). O frontend, construído com React, Tailwind CSS e Shadcn/UI, oferece uma interface responsiva para visualização de métricas. O backend, baseado em Node.js e PostgreSQL, fornece uma API otimizada para consultas em milhões de registros.
+Um sistema completo para monitoramento e análise de envios de mensagens por canais (E-mail, WhatsApp e Push Notification). O frontend, construído com React, Tailwind CSS e Shadcn/UI, oferece uma interface responsiva para visualização de métricas. O backend, baseado em Node.js e PostgreSQL, fornece uma API otimizada para consultas em milhões de registros, com suporte a Docker para desenvolvimento.
 
 ---
 
@@ -71,6 +71,7 @@ Este projeto consiste em um dashboard para monitoramento de envios de mensagens,
 - Node.js (v20)
 - Express (framework API)
 - PostgreSQL (banco de dados)
+- Docker (containerização)
 - Arquivo `seed.sql` (dados de envios)
 
 ---
@@ -79,6 +80,7 @@ Este projeto consiste em um dashboard para monitoramento de envios de mensagens,
 
 - [Node.js](https://nodejs.org/) (v20)
 - [npm](https://www.npmjs.com/)
+- [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/) (para desenvolvimento com backend)
 - [PostgreSQL](https://www.postgresql.org/) (com suporte ao arquivo `seed.sql`)
 
 ---
@@ -104,7 +106,7 @@ Este projeto consiste em um dashboard para monitoramento de envios de mensagens,
 
 5. Acesse o dashboard em: `http://localhost:5173` (porta padrão do Vite).
 
-### Backend
+### Backend (Sem Docker)
 
 1. Navegue até a pasta do backend:
    `cd temporal-evolution/backend`
@@ -114,6 +116,8 @@ Este projeto consiste em um dashboard para monitoramento de envios de mensagens,
 
 3. Configure o banco de dados:
 
+   - Importe o arquivo `seed.sql` para o PostgreSQL:
+     `psql -U usuario -d nome_do_banco < seed.sql`
    - Crie um arquivo `.env` na pasta `backend/` com as credenciais:
      ```
      DATABASE_URL=postgresql://usuario:senha@localhost:5432/nome_do_banco
@@ -123,6 +127,20 @@ Este projeto consiste em um dashboard para monitoramento de envios de mensagens,
    `npm start`
 
 5. A API estará disponível em: `http://localhost:3000` (ou a porta configurada).
+
+### Backend (Com Docker - Desenvolvimento)
+
+1. Certifique-se de que o Docker e o Docker Compose estão instalados.
+2. Navegue até a raiz do repositório (onde está o `docker-compose.yml`):
+   `cd temporal-evolution/backend`
+
+3. Inicie os serviços (backend e PostgreSQL):
+   `docker-compose up --build`
+
+4. A API estará disponível em: `http://localhost:3000`.
+5. O banco de dados PostgreSQL estará acessível em: `localhost:5432` (credenciais definidas no `docker-compose.yml`).
+
+**Nota**: O `docker-compose.yml` é configurado para desenvolvimento e carrega automaticamente o `seed.sql` no PostgreSQL.
 
 ---
 
@@ -155,8 +173,10 @@ Este projeto consiste em um dashboard para monitoramento de envios de mensagens,
   - `routes/` : Rotas da API
   - `controllers/` : Lógica de negócio
   - `models/` : Modelos do banco de dados
-- `backend/seed.sql` : Arquivo modelo dos dados
+- `backend/scripts/seed.sql` : Arquivo modelo dos dados
 - `backend/package.json` : Dependências e scripts
+- `backend/Dockerfile` : Configuração para containerização do backend
+- `docker-compose.yml` : Configuração para desenvolvimento (backend e PostgreSQL)
 - `backend/.env` : Variáveis de ambiente (ex.: conexão com PostgreSQL)
 
 ### Raiz
